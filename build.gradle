@@ -1,0 +1,204 @@
+allprojects {
+    apply plugin: 'idea'
+
+    group = 'com.wepay.riff'
+    version = '0.0.1'
+
+    if (System.env.deploy_version != null) {
+        version = System.env.deploy_version
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url 'http://packages.confluent.io/maven/' }
+    }
+}
+
+project.ext {
+    junitVersion = '4.11'
+    assertjVersion = '3.8.0'
+    mockitoVersion = '2.23.0'
+    nettyVersion = '4.1.15.Final'
+    slf4jVersion = '1.7.21'
+    zkToolsVersion = '0.3.19'
+    jacksonVersion = '2.9.6'
+    servletVersion = '4.0.1'
+    jettyVersion = '9.4.10.v20180503'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://artifactory.devops.wepay-inc.com/artifactory/libs-release-local' }
+    }
+
+    dependencies {
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1'
+    }
+}
+
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'checkstyle'
+    apply plugin: 'findbugs'
+    apply plugin: 'maven-publish'
+
+    sourceCompatibility = 1.8
+
+    jar {
+        manifest {
+            attributes 'Implementation-Title': 'Networking library built on Netty',
+                    'Implementation-Version': version,
+                    'Author': 'Hongyi Wang',
+                    'email': 'di@wepay.com'
+        }
+    }
+
+    artifactory {
+        contextUrl = 'https://artifactory.devops.wepay-inc.com/artifactory/'
+        publish {
+            repoKey = 'libs-release'
+        }
+        resolve {
+            repoKey = 'libs-release'
+        }
+    }
+
+    compileJava {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    compileTestJava {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    checkstyle {
+        toolVersion = "8.10"
+    }
+
+    checkstyleMain {
+        reports {
+            xml {
+                destination "$rootDir/build/reports/checkstyle/main.xml"
+            }
+        }
+        configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
+
+        doLast {
+            ant.xslt(in: "$rootDir/build/reports/checkstyle/main.xml",
+                    style: "../config/checkstyle/checkstyle-noframes.xsl",
+                    out: "$rootDir/build/reports/checkstyle/main.html"
+            )
+        }
+    }
+
+    checkstyleTest {
+        reports {
+            xml {
+                destination "$rootDir/build/reports/checkstyle/test.xml"
+            }
+        }
+        configFile = new File(rootDir, "config/checkstyle/checkstyle_test.xml")
+
+        doLast {
+            ant.xslt(in: "$rootDir/build/reports/checkstyle/test.xml",
+                    style: "$rootDir/config/checkstyle/checkstyle-noframes.xsl",
+                    out: "$rootDir/build/reports/checkstyle/test.html"
+            )
+        }
+    }
+
+    // findbugs html only report
+    findbugsMain {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    findbugsTest {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId project.name
+                from components.java
+            }
+        }
+    }
+
+    artifactoryPublish {
+        publications(publishing.publications.mavenJava)
+    }
+}
+
+project(':riff-config') {
+    dependencies {
+        compile (
+                "org.slf4j:slf4j-api:$slf4jVersion"
+        )
+
+        testCompile (
+                "junit:junit:$junitVersion"
+        )
+    }
+}
+
+project(':riff-metrics') {
+    dependencies {
+        compile (
+                "com.wepay.zktools:zktools:$zkToolsVersion",
+                "org.slf4j:slf4j-api:$slf4jVersion",
+                "org.eclipse.jetty:jetty-http:$jettyVersion",
+                "org.eclipse.jetty:jetty-servlet:$jettyVersion",
+                "org.eclipse.jetty:jetty-server:$jettyVersion",
+                "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+                "javax.servlet:javax.servlet-api:$servletVersion"
+        )
+
+        testCompile (
+                "junit:junit:$junitVersion",
+                "org.assertj:assertj-core:$assertjVersion",
+                "org.mockito:mockito-core:$mockitoVersion",
+                "org.eclipse.jetty:jetty-servlet:$jettyVersion:tests",
+                "org.eclipse.jetty:jetty-http:$jettyVersion:tests"
+        )
+    }
+}
+
+project(':riff-networking') {
+    dependencies {
+        compile (
+                project(':riff-config'),
+                "com.wepay.zktools:zktools:$zkToolsVersion",
+                "io.netty:netty-all:$nettyVersion",
+                "org.slf4j:slf4j-api:$slf4jVersion"
+        )
+
+        testCompile (
+                "junit:junit:$junitVersion",
+                "org.assertj:assertj-core:$assertjVersion",
+                "org.mockito:mockito-core:$mockitoVersion"
+        )
+    }
+}
