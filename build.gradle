@@ -30,18 +30,6 @@ project.ext {
 
 buildscript {
     repositories {
-        mavenCentral()
-        jcenter()
-        maven { url 'https://artifactory.devops.wepay-inc.com/artifactory/libs-release-local' }
-    }
-
-    dependencies {
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1'
-    }
-}
-
-buildscript {
-    repositories {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
@@ -61,19 +49,7 @@ subprojects {
     jar {
         manifest {
             attributes 'Implementation-Title': 'Networking library built on Netty',
-                    'Implementation-Version': version,
-                    'Author': 'Hongyi Wang',
-                    'email': 'di@wepay.com'
-        }
-    }
-
-    artifactory {
-        contextUrl = 'https://artifactory.devops.wepay-inc.com/artifactory/'
-        publish {
-            repoKey = 'libs-release'
-        }
-        resolve {
-            repoKey = 'libs-release'
+                       'Implementation-Version': version
         }
     }
 
