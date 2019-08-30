@@ -6,8 +6,8 @@ import java.util.function.Function;
 
 /**
  * A helper class for a common validation pattern where you just want to pass a method that takes the value and
- * returns a boolean (true if config is good, and false if bad). A common example would be something like:<br/>
- * <br/>
+ * returns a boolean (true if config is good, and false if bad). A common example would be something like:<br>
+ * <br>
  * <code>parser.withValidator("testValidator"::equals, "value must equal 'testValidator'"));</code>
  */
 public class BooleanValidator implements Validator {

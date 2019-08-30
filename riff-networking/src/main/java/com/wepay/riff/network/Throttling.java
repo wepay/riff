@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * An instance of Throttling is created for each MessageHandler and shared by all MessageProcessor associated with it.
  * It toggles the auto read flag through {@link ChannelConfig}. When the auto read is off, netty won't read next message.
  * Throttling keep the message count, and MessageProcessor
- * increments the count by calling {@link this#increment()} when a new message is added
- * and decrements the count by calling {@link this#decrement()} when a message is processed.
+ * increments the count by calling {@link #increment()} when a new message is added
+ * and decrements the count by calling {@link #decrement()} when a message is processed.
  */
 public class Throttling {
 

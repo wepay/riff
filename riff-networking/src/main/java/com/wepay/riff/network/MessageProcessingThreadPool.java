@@ -22,7 +22,7 @@ public class MessageProcessingThreadPool {
 
     /**
      * Creates the thread pool with the specified number of threads.
-     * @param numThreads
+     * @param numThreads number of threads in processing pool
      */
     public MessageProcessingThreadPool(int numThreads) {
         if (numThreads <= 0) {
@@ -38,6 +38,7 @@ public class MessageProcessingThreadPool {
 
     /**
      * Opens this thread pool.
+     * @return returns itself so it can be used functionally
      */
     public MessageProcessingThreadPool open() {
         for (MessageProcessingTask task : tasks) {

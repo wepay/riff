@@ -33,6 +33,7 @@ public interface GraphiteSender extends Closeable {
 
     /**
      * Returns true if ready to send data.
+     * @return returns true if ready to send data
      */
     boolean isConnected();
 

@@ -85,11 +85,13 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
     /**
      * Creates a new {@link ScheduledReporter} instance.
      *
-     * @param registry the {@link com.wepay.riff.metrics.core.MetricRegistry} containing the metrics this
-     *                 reporter will report
-     * @param name     the reporter's name
-     * @param filter   the filter for which metrics to report
-     * @param executor the executor to use while scheduling reporting of metrics.
+     * @param registry     the {@link com.wepay.riff.metrics.core.MetricRegistry} containing the metrics this
+     *                     reporter will report
+     * @param name         the reporter's name
+     * @param filter       the filter for which metrics to report
+     * @param rateUnit     the unit of time
+     * @param durationUnit how long to wait between reporting
+     * @param executor     the executor to use while scheduling reporting of metrics.
      */
     protected ScheduledReporter(MetricRegistry registry,
                                 String name,
@@ -107,6 +109,8 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
      *                               reporter will report
      * @param name                   the reporter's name
      * @param filter                 the filter for which metrics to report
+     * @param rateUnit               the unit of time
+     * @param durationUnit           how long to wait between reporting
      * @param executor               the executor to use while scheduling reporting of metrics.
      * @param shutdownExecutorOnStop if true, then executor will be stopped in same time with this reporter
      */

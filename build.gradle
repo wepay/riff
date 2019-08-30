@@ -1,13 +1,6 @@
 allprojects {
     apply plugin: 'idea'
 
-    group = 'com.wepay.riff'
-    version = '0.0.1'
-
-    if (System.env.deploy_version != null) {
-        version = System.env.deploy_version
-    }
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -22,7 +15,7 @@ project.ext {
     mockitoVersion = '2.23.0'
     nettyVersion = '4.1.15.Final'
     slf4jVersion = '1.7.21'
-    zkToolsVersion = '0.3.19'
+    zkToolsVersion = '0.2.1'
     jacksonVersion = '2.9.6'
     servletVersion = '4.0.1'
     jettyVersion = '9.4.10.v20180503'
@@ -39,10 +32,10 @@ buildscript {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'checkstyle'
     apply plugin: 'findbugs'
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 
     sourceCompatibility = 1.8
 
@@ -67,36 +60,8 @@ subprojects {
         toolVersion = "8.10"
     }
 
-    checkstyleMain {
-        reports {
-            xml {
-                destination "$rootDir/build/reports/checkstyle/main.xml"
-            }
-        }
-        configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-
-        doLast {
-            ant.xslt(in: "$rootDir/build/reports/checkstyle/main.xml",
-                    style: "../config/checkstyle/checkstyle-noframes.xsl",
-                    out: "$rootDir/build/reports/checkstyle/main.html"
-            )
-        }
-    }
-
     checkstyleTest {
-        reports {
-            xml {
-                destination "$rootDir/build/reports/checkstyle/test.xml"
-            }
-        }
-        configFile = new File(rootDir, "config/checkstyle/checkstyle_test.xml")
-
-        doLast {
-            ant.xslt(in: "$rootDir/build/reports/checkstyle/test.xml",
-                    style: "$rootDir/config/checkstyle/checkstyle-noframes.xsl",
-                    out: "$rootDir/build/reports/checkstyle/test.html"
-            )
-        }
+        configFile = project.file ("${rootProject.projectDir}/config/checkstyle/checkstyle_test.xml")
     }
 
     // findbugs html only report
@@ -114,17 +79,64 @@ subprojects {
         }
     }
 
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier = 'sources'
+    }
+
+    task javadocJar(type: Jar) {
+        from javadoc
+        archiveClassifier = 'javadoc'
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId project.name
+                artifactId = project.name
+
                 from components.java
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = 'Riff'
+                    description = 'Riff is a networking library built based on Netty.'
+                    url = 'https://www.github.com/wepay/riff'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'ymatsuda'
+                            name = 'Yasuhiro Matsuda'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/wepay/riff.git'
+                        developerConnection = 'scm:git:ssh://github.com/wepay/riff.git'
+                        url = 'https://github.com/wepay/riff'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+                def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username findProperty('ossrhUsername')?: ''
+                    password findProperty('ossrhPassword')?: ''
+                }
             }
         }
     }
 
-    artifactoryPublish {
-        publications(publishing.publications.mavenJava)
+    signing {
+        sign publishing.publications.mavenJava
     }
 }
 

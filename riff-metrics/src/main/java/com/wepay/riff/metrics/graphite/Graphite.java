@@ -88,7 +88,6 @@ public class Graphite implements GraphiteSender {
      * @param name the name of the metric.
      * @param value The value of the metric.
      * @param timestamp The timestamp of the metric.
-     * @throws IOException
      */
     public void send(final String name, final String value, long timestamp) throws IOException {
         try {
@@ -105,7 +104,6 @@ public class Graphite implements GraphiteSender {
 
     /**
      * Flushes the writer.
-     * @throws IOException
      */
     public void flush() throws IOException {
         if (writer != null) {
@@ -115,7 +113,6 @@ public class Graphite implements GraphiteSender {
 
     /**
      * Close the socket as well as the writer.
-     * @throws IOException
      */
     @Override
     public void close() throws IOException {
