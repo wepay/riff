@@ -1,10 +1,10 @@
 language: java
 os: linux
-dist: trusty
-jdk: oraclejdk8
+dist: xenial
+jdk: openjdk8
 
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:

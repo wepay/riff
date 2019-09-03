@@ -80,7 +80,6 @@ public class GraphiteUDP implements GraphiteSender {
      * @param name the name of the metric.
      * @param value The value of the metric.
      * @param timestamp The timestamp of the metric.
-     * @throws IOException
      */
     @Override
     public void send(final String name, final String value, final long timestamp) throws IOException {
@@ -105,7 +104,6 @@ public class GraphiteUDP implements GraphiteSender {
 
     /**
      * Close the socket.
-     * @throws IOException
      */
     @Override
     public void close() throws IOException {

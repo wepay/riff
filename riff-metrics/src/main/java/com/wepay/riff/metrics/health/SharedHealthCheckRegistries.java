@@ -68,6 +68,7 @@ public final class SharedHealthCheckRegistries {
      * @param name                the default registry name
      * @param healthCheckRegistry the default registry
      * @throws IllegalStateException if the default registry has already been set
+     * @return health check registry
      */
     public static HealthCheckRegistry setDefault(String name, HealthCheckRegistry healthCheckRegistry) {
         if (defaultRegistryName.compareAndSet(null, name)) {

@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * MessageProcessor maintains a queue of messages. It accepts a new message ({@link this#offer(Message)}) and append it
+ * MessageProcessor maintains a queue of messages. It accepts a new message ({@link #offer(Message)}) and append it
  * to the queue. An instance of MessageProcessor submits itself to {@link MessageProcessingThreadPool} when there are
- * messages to process. {@link MessageProcessingThreadPool} calls {@link this#processMessage()} to process a next
+ * messages to process. {@link MessageProcessingThreadPool} calls {@link #processMessage()} to process a next
  * available message.
  */
 public abstract class MessageProcessor {
