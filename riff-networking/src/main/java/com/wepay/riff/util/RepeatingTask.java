@@ -47,8 +47,13 @@ public abstract class RepeatingTask {
     }
 
     public CompletableFuture<Boolean> stop() {
-        if (state.compareAndSet(TaskState.NEW, TaskState.STOPPED) || state.compareAndSet(TaskState.RUNNING, TaskState.STOPPED)) {
+        if (state.compareAndSet(TaskState.NEW, TaskState.STOPPED)) {
+            // The thread was not running. Complete the future now.
             shutdownFuture.complete(true);
+        } else {
+            // The thread is running or is already stopped.
+            // If running, the future will be completed by the thread. otherwise, the future should be completed already.
+            state.compareAndSet(TaskState.RUNNING, TaskState.STOPPED);
         }
         return shutdownFuture;
     }
