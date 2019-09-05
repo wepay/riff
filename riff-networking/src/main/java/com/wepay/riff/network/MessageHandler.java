@@ -10,6 +10,7 @@ import io.netty.channel.WriteBufferWaterMark;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -197,8 +198,14 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<Message
 
     @Override
     public final void exceptionCaught(ChannelHandlerContext ctx, Throwable ex) {
-        if (!(ex instanceof DisconnectedException)) {
-            logger.error("exception caught: handler=" + this.getClass().getName(), ex);
+        if (ex instanceof SSLHandshakeException) {
+            logger.error(
+                "exception caught: handler={}, SSL handshake failed {}",
+                this.getClass().getName(),
+                ctx.channel()
+            );
+        } else if (!(ex instanceof DisconnectedException)) {
+            logger.error("exception caught: handler={}, channel={}", this.getClass().getName(), ctx.channel(), ex);
         }
 
         shutdown();
