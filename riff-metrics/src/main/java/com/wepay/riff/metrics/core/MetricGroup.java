@@ -6,6 +6,7 @@ package com.wepay.riff.metrics.core;
 public final class MetricGroup {
     public static final String WALTZ_SERVER_METRIC_GROUP = "waltz-server";
     public static final String WALTZ_STORAGE_METRIC_GROUP = "waltz-storage";
+    public static final String WALTZ_CLIENT_METRIC_GROUP = "waltz-client";
 
     private MetricGroup() {
         //not called
