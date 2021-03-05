@@ -114,9 +114,7 @@ public abstract class NetworkClient implements Closeable {
             if (isValid()) {
                 state.set(ClientState.CLOSING);
 
-                if (channelFuture == null) {
-                    shutdown();
-                } else {
+                if (channelFuture != null) {
                     channelFuture.addListener(f -> {
                         if (f.isSuccess()) {
                             Channel channel = ((ChannelFuture) f).channel();
@@ -127,8 +125,10 @@ public abstract class NetworkClient implements Closeable {
                             }
                         }
                     });
+                    return;
                 }
             }
+            shutdown();
         }
     }
 
