@@ -128,8 +128,8 @@ public abstract class NetworkClient implements Closeable {
                     return;
                 }
             }
-            shutdown();
         }
+        shutdown();
     }
 
     @Override
