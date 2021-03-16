@@ -111,25 +111,27 @@ public abstract class NetworkClient implements Closeable {
 
     public void closeAsync() {
         synchronized (this) {
-            if (isValid()) {
+            if (isValid() && channelFuture != null) {
                 state.set(ClientState.CLOSING);
-
-                if (channelFuture != null) {
-                    channelFuture.addListener(f -> {
-                        if (f.isSuccess()) {
-                            Channel channel = ((ChannelFuture) f).channel();
-                            if (channel.isOpen()) {
-                                channel.close().addListener(f2 -> shutdown());
-                            } else {
-                                shutdown();
-                            }
+                channelFuture.addListener(f -> {
+                    if (f.isSuccess()) {
+                        Channel channel = ((ChannelFuture) f).channel();
+                        if (channel.isOpen()) {
+                            channel.close().addListener(f2 -> shutdown());
+                        } else {
+                            shutdown();
                         }
-                    });
-                    return;
-                }
+                    }
+                });
+                return;
             }
         }
-        shutdown();
+        synchronized (state) {
+            if (isValid()) {
+                state.set(ClientState.CLOSING);
+                shutdown();
+            }
+        }
     }
 
     @Override
