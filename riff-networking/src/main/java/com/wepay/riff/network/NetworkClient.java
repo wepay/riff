@@ -54,16 +54,13 @@ public abstract class NetworkClient implements Closeable {
     protected abstract MessageHandler getMessageHandler();
 
     public void openAsync() {
-        synchronized (state) {
+        synchronized (this) {
             if (!state.is(ClientState.NEW)) {
                 return;
             }
             state.set(ClientState.STARTED);
             messageHandler = getMessageHandler();
             group = new NioEventLoopGroup();
-        }
-
-        synchronized (this) {
             Bootstrap b = new Bootstrap();
             b.group(group)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -114,16 +111,20 @@ public abstract class NetworkClient implements Closeable {
             if (isValid()) {
                 state.set(ClientState.CLOSING);
 
-                channelFuture.addListener(f -> {
-                    if (f.isSuccess()) {
-                        Channel channel = ((ChannelFuture) f).channel();
-                        if (channel.isOpen()) {
-                            channel.close().addListener(f2 -> shutdown());
-                        } else {
-                            shutdown();
+                if (channelFuture != null) {
+                    channelFuture.addListener(f -> {
+                        if (f.isSuccess()) {
+                            Channel channel = ((ChannelFuture) f).channel();
+                            if (channel.isOpen()) {
+                                channel.close().addListener(f2 -> shutdown());
+                            } else {
+                                shutdown();
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    shutdown();
+                }
             }
         }
     }
@@ -147,7 +148,7 @@ public abstract class NetworkClient implements Closeable {
     }
 
     protected void shutdown() {
-        synchronized (state) {
+        synchronized (this) {
             if (!state.is(ClientState.DISCONNECTED)) {
                 state.set(ClientState.DISCONNECTED);
                 if (group != null) {
