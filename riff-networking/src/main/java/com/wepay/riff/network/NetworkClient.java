@@ -16,6 +16,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.timeout.IdleStateHandler;
 
 import java.io.Closeable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -43,6 +44,8 @@ public abstract class NetworkClient implements Closeable {
     private EventLoopGroup group;
     private ChannelFuture channelFuture;
     private volatile boolean openFailed = false;
+
+    private static final int keepAliveWriteTimeout = 600;
 
     public NetworkClient(String host, int port, SslContext sslCtx) {
         this.host = host;
@@ -204,6 +207,9 @@ public abstract class NetworkClient implements Closeable {
         @Override
         public void initChannel(SocketChannel ch) {
             ChannelPipeline pipeline = ch.pipeline();
+
+            // Add IdleStateHandler logic - supposed to be first item added to pipeline
+            pipeline.addLast("idleStateHandler", new IdleStateHandler(0, keepAliveWriteTimeout, 0));
 
             if (sslCtx != null) {
                 pipeline.addLast(sslCtx.newHandler(ch.alloc(), host, port));

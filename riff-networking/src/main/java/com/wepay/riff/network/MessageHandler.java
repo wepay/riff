@@ -7,6 +7,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.WriteBufferWaterMark;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 
@@ -131,7 +133,7 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<Message
 
     @Override
     public final void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
-        if (msg.type() == Hello.MESSAGE_TYPE) {
+        if (msg.type() == MessageType.HELLO) {
             // Hello message
             Hello hello = (Hello) msg;
 
@@ -237,6 +239,20 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<Message
         }
     }
 
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+        try {
+            if (evt instanceof IdleStateEvent) {
+                IdleStateEvent e = (IdleStateEvent) evt;
+                if (e.state() == IdleState.WRITER_IDLE) {
+                    this.sendKeepAlive(ctx);
+                }
+            }
+        } catch (Exception ex) {
+            logger.info("KeepAlive message failed to be send: {}", ex);
+        }
+    }
+
     public boolean isActive() {
         return ctx != null;
     }
@@ -254,6 +270,11 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<Message
     protected void sendHello(ChannelHandlerContext ctx) {
         logger.debug("sending Hello: message=[{}] to={}", helloMessage, ctx.channel());
         ctx.writeAndFlush(new Hello(codecs.keySet(), helloMessage)).addListener(writeCompletionListener);
+    }
+
+    protected void sendKeepAlive(ChannelHandlerContext ctx) {
+        logger.info("Connection idle period exceeded... Sending KeepAlive to={}", ctx.channel());
+        ctx.writeAndFlush(new KeepAliveMessage()).addListener(writeCompletionListener);
     }
 
     public boolean sendMessage(Message msg, boolean flush) {

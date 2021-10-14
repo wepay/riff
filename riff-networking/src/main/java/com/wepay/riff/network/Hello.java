@@ -4,8 +4,6 @@ import java.util.Set;
 
 public class Hello extends Message {
 
-    public static final byte MESSAGE_TYPE = -1;
-
     public final Set<Short> versions;
     public final String message;
 
@@ -16,7 +14,7 @@ public class Hello extends Message {
 
     @Override
     public byte type() {
-        return MESSAGE_TYPE;
+        return MessageType.HELLO;
     }
 
 }

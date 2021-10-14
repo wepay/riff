@@ -32,7 +32,9 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
 
         // Encode the message
         MessageAttributeWriter writer = new ByteBufMessageAttributeWriter(out);
-        codec.encode(msg, writer);
+        if (!(msg instanceof KeepAliveMessage)) {
+            codec.encode(msg, writer);
+        }
 
         out.setInt(index, writer.bytesWritten());
     }
