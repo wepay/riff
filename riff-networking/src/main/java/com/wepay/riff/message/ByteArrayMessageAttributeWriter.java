@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class ByteArrayMessageAttributeWriter extends MessageAttributeWriter {
 
@@ -106,6 +107,24 @@ public class ByteArrayMessageAttributeWriter extends MessageAttributeWriter {
                     buf.writeInt(value);
                 }
                 bytesWritten += (4 + array.length * 4);
+
+            } else {
+                buf.writeInt(-1);
+                bytesWritten += 4;
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("message corrupted");
+        }
+    }
+
+    public void writeIntList(List<Integer> list) {
+        try {
+            if (list != null) {
+                buf.writeInt(list.size());
+                for (int value : list) {
+                    buf.writeInt(value);
+                }
+                bytesWritten += (4 + list.size() * 4);
 
             } else {
                 buf.writeInt(-1);

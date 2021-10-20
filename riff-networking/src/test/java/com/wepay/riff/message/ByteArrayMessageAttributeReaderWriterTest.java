@@ -4,7 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -39,6 +41,12 @@ public class ByteArrayMessageAttributeReaderWriterTest {
             intArrayVal[i] = rand.nextInt();
         }
 
+        int size = rand.nextInt(1000);
+        List<Integer> intListVal = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            intListVal.add(rand.nextInt());
+        }
+
         long longVal = rand.nextLong();
 
         double doubleVal = rand.nextDouble();
@@ -63,6 +71,8 @@ public class ByteArrayMessageAttributeReaderWriterTest {
         writer.writeInt(intVal);
         writer.writeIntArray(intArrayVal);
         writer.writeIntArray(null);
+        writer.writeIntList(intListVal);
+        writer.writeIntList(null);
 
         writer.writeLong(longVal);
 
@@ -86,6 +96,8 @@ public class ByteArrayMessageAttributeReaderWriterTest {
         assertEquals(intVal, reader.readInt());
         assertTrue(Arrays.equals(intArrayVal, reader.readIntArray()));
         assertNull(reader.readIntArray());
+        assertTrue(intListVal.equals(reader.readIntList()));
+        assertNull(reader.readIntList());
 
         assertEquals(longVal, reader.readLong());
 
@@ -127,6 +139,12 @@ public class ByteArrayMessageAttributeReaderWriterTest {
             intArrayVal[i] = rand.nextInt();
         }
 
+        int size = rand.nextInt(1000);
+        List<Integer> intListVal = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            intListVal.add(rand.nextInt());
+        }
+
         long longVal = rand.nextLong();
 
         double doubleVal = rand.nextDouble();
@@ -151,6 +169,8 @@ public class ByteArrayMessageAttributeReaderWriterTest {
         writer.writeInt(intVal);
         writer.writeIntArray(intArrayVal);
         writer.writeIntArray(null);
+        writer.writeIntList(intListVal);
+        writer.writeIntList(null);
 
         writer.writeLong(longVal);
 
@@ -174,6 +194,8 @@ public class ByteArrayMessageAttributeReaderWriterTest {
         assertEquals(intVal, reader.readInt());
         assertTrue(Arrays.equals(intArrayVal, reader.readIntArray()));
         assertNull(reader.readIntArray());
+        assertTrue(intListVal.equals(reader.readIntList()));
+        assertNull(reader.readIntList());
 
         assertEquals(longVal, reader.readLong());
 

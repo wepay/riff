@@ -4,6 +4,7 @@ import com.wepay.riff.network.MessageAttributeWriter;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class ByteBufMessageAttributeWriter extends MessageAttributeWriter {
 
@@ -73,6 +74,20 @@ public class ByteBufMessageAttributeWriter extends MessageAttributeWriter {
                 buf.writeInt(value);
             }
             bytesWritten += (4 + array.length * 4);
+
+        } else {
+            buf.writeInt(-1);
+            bytesWritten += 4;
+        }
+    }
+
+    public void writeIntList(List<Integer> list) {
+        if (list != null) {
+            buf.writeInt(list.size());
+            for (int value : list) {
+                buf.writeInt(value);
+            }
+            bytesWritten += (4 + list.size() * 4);
 
         } else {
             buf.writeInt(-1);
