@@ -1,10 +1,12 @@
 package com.wepay.riff.network;
 
 import com.wepay.riff.message.ByteBufMessageAttributeReader;
+import com.wepay.riff.util.Logging;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.CorruptedFrameException;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     private final byte magicByte;
     private final short version;
     private final MessageCodec codec;
+    private static final Logger logger = Logging.getLogger(MessageDecoder.class);
 
     public MessageDecoder(MessageCodec codec) {
         this.magicByte = codec.magicByte();
@@ -63,7 +66,11 @@ public class MessageDecoder extends ByteToMessageDecoder {
 
         // Decode the received data into a new Message.
         MessageAttributeReader reader = new ByteBufMessageAttributeReader(in, length);
-        out.add(codec.decode(reader));
+        if (length != 0) {
+            out.add(codec.decode(reader));
+        } else {
+            logger.debug("Received KeepAlive from={}.", ctx.channel());
+        }
 
         reader.ensureReadCompletely();
     }
