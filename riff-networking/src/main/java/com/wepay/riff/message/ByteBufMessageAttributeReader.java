@@ -4,6 +4,8 @@ import com.wepay.riff.network.MessageAttributeReader;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ByteBufMessageAttributeReader extends MessageAttributeReader {
 
@@ -94,6 +96,25 @@ public class ByteBufMessageAttributeReader extends MessageAttributeReader {
                 array[i] = buf.readInt();
             }
             return array;
+
+        } else {
+            return null;
+        }
+    }
+
+    public List<Integer> readIntList() {
+        checkDataSize(4);
+
+        int arrayLength = buf.readInt();
+
+        if (arrayLength >= 0) {
+            checkDataSize(arrayLength * 4);
+
+            List<Integer> arrayList = new ArrayList<>(arrayLength);
+            for (int i = 0; i < arrayLength; i++) {
+                arrayList.add(buf.readInt());
+            }
+            return arrayList;
 
         } else {
             return null;

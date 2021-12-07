@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ByteArrayMessageAttributeReader extends MessageAttributeReader {
 
@@ -110,6 +112,25 @@ public class ByteArrayMessageAttributeReader extends MessageAttributeReader {
                     array[i] = readInt();
                 }
                 return array;
+
+            } else {
+                return null;
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("corrupted message");
+        }
+    }
+
+    public List<Integer> readIntList() {
+        try {
+            int arrayLength = buf.readInt();
+
+            if (arrayLength >= 0) {
+                List<Integer> arrayList = new ArrayList<>(arrayLength);
+                for (int i = 0; i < arrayLength; i++) {
+                    arrayList.add(readInt());
+                }
+                return arrayList;
 
             } else {
                 return null;
