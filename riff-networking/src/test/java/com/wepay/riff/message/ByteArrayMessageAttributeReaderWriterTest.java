@@ -112,7 +112,7 @@ public class ByteArrayMessageAttributeReaderWriterTest {
     @Test
     public void testReadFromByteBuf() {
         Random rand = new Random();
-        byte[] bytes = new byte[10000];
+        byte[] bytes = new byte[15000];
 
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
         byteBuf.resetWriterIndex();

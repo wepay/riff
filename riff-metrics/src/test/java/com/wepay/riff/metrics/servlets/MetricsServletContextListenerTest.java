@@ -52,6 +52,8 @@ public class MetricsServletContextListenerTest extends AbstractServletTest {
 
     @Before
     public void setUp() {
+        registry.removeAllMetrics();
+
         when(clock.getTick()).thenReturn(100L, 200L, 300L, 400L);
 
         registry.register("group", "g1", (Gauge<Long>) () -> 100L);
