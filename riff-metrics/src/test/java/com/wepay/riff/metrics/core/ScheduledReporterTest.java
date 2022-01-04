@@ -1,7 +1,7 @@
 package com.wepay.riff.metrics.core;
 
 import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.SortedMap;
@@ -47,10 +47,8 @@ public class ScheduledReporterTest {
     private final DummyReporter reporterWithExternallyManagedExecutor = new DummyReporter(registry, "example", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS, externalExecutor, false);
     private final ScheduledReporter[] reporters = new ScheduledReporter[] {reporter, reporterWithCustomExecutor, reporterWithExternallyManagedExecutor};
 
-    @BeforeClass
-    @SuppressWarnings("unchecked")
-    public static void setUp() throws Exception {
-        registry.removeAllMetrics();
+    @Before
+    public void setUp() {
         registry.register("group", "gauge", gauge);
         registry.register("group", "counter", counter);
         registry.register("group", "histogram", histogram);
@@ -59,11 +57,12 @@ public class ScheduledReporterTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void cleanUp() {
         customExecutor.shutdown();
         externalExecutor.shutdown();
         reporter.stop();
         reporterWithNullExecutor.stop();
+        registry.removeAllMetrics();
     }
 
     @Test

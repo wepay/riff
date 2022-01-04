@@ -1,5 +1,6 @@
 package com.wepay.riff.metrics.core;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,9 +26,13 @@ public class MetricRegistryTest {
 
     @Before
     public void setUp() {
-        registry.removeAllMetrics();
         registry.removeAllListener();
         registry.addListener(listener);
+    }
+
+    @After
+    public void cleanUp() {
+        registry.removeAllMetrics();
     }
 
     @Test

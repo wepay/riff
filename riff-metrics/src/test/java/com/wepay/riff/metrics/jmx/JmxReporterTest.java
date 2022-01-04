@@ -106,7 +106,6 @@ public class JmxReporterTest {
 
         when(timer.getSnapshot()).thenReturn(tSnapshot);
 
-        registry.removeAllMetrics();
         registry.register("group", "gauge", gauge);
         registry.register("group", "test.counter", counter);
         registry.register("group", "test.histogram", histogram);
@@ -117,7 +116,7 @@ public class JmxReporterTest {
     }
 
     @After
-    public void tearDown() {
+    public void cleanUp() {
         reporter.stop();
         registry.removeAllMetrics();
     }
