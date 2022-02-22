@@ -273,7 +273,7 @@ public abstract class MessageHandler extends SimpleChannelInboundHandler<Message
     }
 
     protected void sendKeepAlive(ChannelHandlerContext ctx) {
-        logger.info("Connection idle period exceeded... Sending KeepAlive to={}", ctx.channel());
+        logger.debug("Connection idle period exceeded... Sending KeepAlive to={}", ctx.channel());
         ctx.writeAndFlush(new KeepAliveMessage()).addListener(writeCompletionListener);
     }
 
