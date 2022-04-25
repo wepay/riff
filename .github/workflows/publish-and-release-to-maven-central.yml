@@ -73,6 +73,7 @@ jobs:
         run: |
           sed -i 's/username findProperty('\''ossrhUsername'\'')?: '\'''\''/username findProperty("ossrhUsername")?: System.getenv("OSSRH_USERNAME")/g' "build.gradle"
           sed -i 's/password findProperty('\''ossrhPassword'\'')?: '\'''\''/password findProperty("ossrhPassword")?: System.getenv("OSSRH_PASSWORD")/g' "build.gradle"
+
       #Publish project
       - name: Publish
         run: ./gradlew publish -PmySecureRepositoryUsername="$OSSRH_USERNAME" -PmySecureRepositoryPassword="$OSSRH_PASSWORD" -Psigning.keyId="$SIGNING_KEY_ID" -Psigning.password="$OSSRH_GPG_SECRET_KEY_PASSWORD" -Psigning.secretKeyRingFile=$(echo ~/.gnupg/secring.gpg)
@@ -125,10 +126,10 @@ jobs:
             serverUrl = \"https://oss.sonatype.org/service/local/\"
             username = findProperty(\"ossrhUsername\") ?: System.getenv(\"OSSRH_USERNAME\")
             password = findProperty(\"ossrhPassword\") ?: System.getenv(\"OSSRH_PASSWORD\")
-            packageGroup = \"io.github.hrdlotom\"
+            packageGroup = \"com.wepay.riff\"
           }" >> "build.gradle"
           fi
-          cat "build.gradle"
+
       #Close and Release project in Sonatype
       - name: Close and Release
         run: ./gradlew closeAndReleaseRepository
